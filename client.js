@@ -1,13 +1,40 @@
 var socket = io();
 
-socket.on("connect", () => console.log("connect", socket.id));
-socket.on("connect_error", (reason) => console.log("connect_error", reason));
-socket.on("disconnect", (reason) => console.log("disconnect", reason));
+let intervalId = null;
+
+const green = "green";
+const yellow = "yellow";
+const red = "red";
+const white = "white";
+
+socket.on("connect", () => {
+  setStatus("Connected", null, green);
+  console.log("connect", socket.id);
+});
+socket.on("connect_error", (reason) => {
+  setStatus("Connection Error", reason, yellow);
+  console.log("connect_error", reason);
+});
+socket.on("disconnect", (reason) => {
+  setStatus("Disconnected", reason, red);
+  console.log("disconnect", reason);
+});
 
 socket.on("message", (response) => receiveResponse(response));
 
 const receiveResponse = (response) => {
-  console.log(`response`, response);
+  const { clientTime, serverTime } = response;
+  const now = Date.now();
+  const clientToServer = serverTime - clientTime;
+  const serverToClient = now - serverTime;
+  const totalRoundTrip = now - clientTime;
+
+  document.querySelector(".clientToServer").innerHTML = clientToServer;
+  document.querySelector(".serverToClient").innerHTML = serverToClient;
+  document.querySelector(".totalRoundTrip").innerHTML = totalRoundTrip;
+  console.log(
+    `Total RT: ${totalRoundTrip}, Client-to-Server: ${clientToServer}, Server-to-Client: ${serverToClient}.`
+  );
 };
 
 const sendRequest = () => {
@@ -17,4 +44,20 @@ const sendRequest = () => {
   socket.emit("message", payload);
 };
 
-document.querySelector(".button").addEventListener("click", sendRequest);
+const setStatus = (status, note, color = white) => {
+  document.querySelector("#status").innerHTML = status;
+  document.querySelector("#note").innerHTML = note;
+  document.querySelector(".container").style.backgroundColor = color;
+};
+
+const startStop = () => {
+  if (intervalId) {
+    clearInterval(intervalId);
+    intervalId = null;
+  } else {
+    intervalId = setInterval(sendRequest, 500);
+  }
+  console.log(`intervalId`, intervalId);
+};
+
+document.querySelector(".button").addEventListener("click", startStop);

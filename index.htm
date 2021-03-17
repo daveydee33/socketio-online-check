@@ -9,7 +9,15 @@
   <script src="./client.js" defer></script>
 </head>
 <body>
-  <h1>Hi</h1>
-  <button class="button">Test</button>
+  <div class="container" background-color="white">
+    <h1>Live Connection Status</h1>
+    <h2>Status: <span id="status"></span></h2>
+    <h3 id="note"></h3>
+    <h2>Round Trip Time (ms): <span class="totalRoundTrip">...</span></h2>
+    <h3>Client-to-Server Time (ms): <span class="clientToServer">...</span></h3>
+    <h3>Server-to-Client Time (ms): <span class="serverToClient">...</span></h3>
+    <br>
+    <button class="button">Start/Stop</button>  
+  </div>
 </body>
 </html>
