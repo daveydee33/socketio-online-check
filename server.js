@@ -3,6 +3,7 @@ const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 
 const PORT = process.env.PORT || 8080;
+const DEV = (process.env.DEV || "").trim().toLowerCase() === "true"; // to show more logs if in Dev mode.
 
 // Express
 app.get("/", (req, res) => {
@@ -15,27 +16,44 @@ app.get("/client.js", (req, res) => {
 
 // SocketIO
 io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
+  const displayNumConnections = () =>
+    log(`# There are now ${io.of("/").sockets.size} active connections`);
+
+  log(
+    "🔌 New user connected",
+    socket.id,
+    socket.handshake.headers.host,
+    socket.handshake.headers.referer,
+    socket.handshake.address,
+    socket.handshake.url
+  );
+  displayNumConnections();
 
   socket.on("disconnect", (reason) => {
-    console.log("disconnect", reason);
+    log("👋 Disconnect", reason);
+    displayNumConnections();
   });
 
   socket.on("disconnecting", (reason) => {
-    console.log("disconnecting", reason);
+    log("👋 Disconnecting", reason);
   });
 
   socket.on("message", (msg) => {
-    // console.log(`message`, msg);
-    const { clientTime } = msg;
+    if (DEV) log(`✅ message`, msg);
+
     socket.emit("message", {
-      clientTime,
+      ...msg,
       serverTime: Date.now(),
     });
   });
 });
 
+// Logger
+const log = (...args) => {
+  console.log("Log>", Date(), ...args);
+};
+
 // Listen
 http.listen(PORT, () => {
-  console.log(`✅ Listening on port ${PORT}`);
+  log(`🚀 Listening on port ${PORT}`);
 });

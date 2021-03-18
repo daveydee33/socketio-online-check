@@ -2,9 +2,9 @@ var socket = io();
 
 let intervalId = null;
 
-const green = "green";
+const green = "lime";
 const yellow = "yellow";
-const red = "red";
+const red = "firebrick";
 const white = "white";
 
 socket.on("connect", () => {
@@ -12,7 +12,7 @@ socket.on("connect", () => {
   console.log("connect", socket.id);
 });
 socket.on("connect_error", (reason) => {
-  setStatus("Connection Error", reason, yellow);
+  setStatus("Connection Error - Trying to Reconnect", reason, yellow);
   console.log("connect_error", reason);
 });
 socket.on("disconnect", (reason) => {
@@ -57,7 +57,7 @@ const startStop = () => {
   } else {
     intervalId = setInterval(sendRequest, 500);
   }
-  console.log(`intervalId`, intervalId);
 };
 
+document.addEventListener("DOMContentLoaded", startStop); // start on page load
 document.querySelector(".button").addEventListener("click", startStop);
