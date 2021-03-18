@@ -1,4 +1,7 @@
 ## Am I Online?
+
+Try It: https://socketio-online-check.herokuapp.com/
+
 This is a client and server application to monitor the live connection using Socket.io with WebSockets.  
 
 We can use this to display the live online status as well as check the current latency between the client and server.
